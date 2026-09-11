@@ -13,6 +13,7 @@
 | `F4` | Slow NoClip Speed |
 | `F5` | Fast NoClip Speed |
 | `F8` | Show Object Visible / Hide Floor |
+| `F9` | Visible Floor |
 | `F12` | Teleport (same as console `Teleport` command) |
 | `INSERT` | Toggle Debug Camera (same as console `ToggleDebugCamera` command) |
 | `DELETE` | Change ViewMode between Lit / Unlit |
