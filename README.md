@@ -1,62 +1,89 @@
 # Nightmare-Kart-SpeedRunTool
 
-F1 NoClip
-  W A S D Move
-  Numpad 4 6 Yaw
-  Numpad 8 5 Pitch
-F2 Save Position Rotation Velocity
-F3 Restore Position Rotation Velocity
-F4 Slow NoClip Speed
-F5 Fast NoClip Speed
-F8 Show Object Visible
-F8 Hide Floor
+## Keybinds
 
-F12 Telelport same in console input Teleport
-INSERT ToggleDebugCamera same in console input ToggleDebugCamera
-DELETE Change ViewMode Between Lit / Unlit
+| Key | Action |
+|---|---|
+| `F1` | NoClip |
+| `W A S D` | Move |
+| `Numpad 4 / 6` | Yaw |
+| `Numpad 8 / 5` | Pitch |
+| `F2` | Save Position / Rotation / Velocity |
+| `F3` | Restore Position / Rotation / Velocity |
+| `F4` | Slow NoClip Speed |
+| `F5` | Fast NoClip Speed |
+| `F8` | Show Object Visible / Hide Floor |
+| `F12` | Teleport (same as console `Teleport` command) |
+| `INSERT` | Toggle Debug Camera (same as console `ToggleDebugCamera` command) |
+| `DELETE` | Change ViewMode between Lit / Unlit |
 
+---
 
-# Install UE4SS experimental-latest
-https://github.com/UE4SS-RE/RE-UE4SS/releases/tag/experimental-latest
-UE4SS_v3.0.1-xxxx-xxxxxx.zip
+## Install UE4SS (experimental-latest)
 
-Put to 
+Download: [UE4SS-RE/RE-UE4SS — experimental-latest](https://github.com/UE4SS-RE/RE-UE4SS/releases/tag/experimental-latest)
+
+File: `UE4SS_v3.0.1-xxxx-xxxxxx.zip`
+
+**Unzip UE4SS to:**
+```
 Root\NMKART\Binaries\Win64
-Will Seen NMKART-Win64-Shipping.exe
+```
 
-UnZip UE4SS
+You should now see:
+```
 Root\NMKART\Binaries\Win64\NMKART-Win64-Shipping.exe
 Root\NMKART\Binaries\Win64\ue4ss
 Root\NMKART\Binaries\Win64\dwmapi.dll
+```
 
-Open UE4SS Console
-
+**Open the UE4SS console** by editing:
+```
 ue4ss/UE4SS-settings.ini
+```
 
+```ini
 [Debug]
 ; Whether to enable the external UE4SS debug console.
 ConsoleEnabled = 0
-GuiConsoleEnabled = 1 // Set 1
-GuiConsoleVisible = 1 // Set 1
+GuiConsoleEnabled = 1   ; Set 1
+GuiConsoleVisible = 1   ; Set 1
+```
 
-Install Mod
+---
 
-Unzip SpeedRunTool.zip
-To
+## Install the Mod
+
+**Unzip `SpeedRunTool.zip` to:**
+```
 Root\NMKART\Binaries\Win64\ue4ss\mods
+```
 
+Result:
+```
 Root\NMKART\Binaries\Win64\ue4ss\mods\SpeedRunTool
 Root\NMKART\Binaries\Win64\ue4ss\mods\SpeedRunTool\Scripts\main.lua
+```
 
-Modify mods.txt
+**Modify `mods.txt`** — add:
+```
+SpeedRunTool : 1
+```
 
-Add SpeedRunTool : 1
+---
 
-View Collision
+## View Collision
 
-```text
+Edit:
+```
 %LOCALAPPDATA%\NMKART\Saved\Config\WindowsNoEditor\Engine.ini
 ```
 
+```ini
 [SystemSettings]
 r.ForceDebugViewModes=1
+```
+
+## Reference
+
+https://forums.unrealengine.com/t/buffer-visualization-in-executable-build-of-my-project/27059/6
