@@ -44,55 +44,45 @@ end
 
 -- Move function (WASDQE)
 local function MoveOnce(direction)
-    if not noclip then return end
-    local pawn = UEHelpers.GetPlayerController():K2_GetPawn()
-    if not (pawn and pawn:IsValid()) then return end
+    ExecuteInGameThread(function()
+        if not noclip then return end
+        local pawn = UEHelpers.GetPlayerController():K2_GetPawn()
+        if not (pawn and pawn:IsValid()) then return end
 
-    local forward, right = GetDirectionVectors()
-    local dx, dy, dz = 0, 0, 0
+        local forward, right = GetDirectionVectors()
+        local dx, dy, dz = 0, 0, 0
 
-    if direction == "W" then dx, dy, dz = forward.X * moveStep, forward.Y * moveStep, forward.Z * moveStep
-    elseif direction == "S" then dx, dy, dz = -forward.X * moveStep, -forward.Y * moveStep, -forward.Z * moveStep
-    elseif direction == "D" then dx, dy = right.X * moveStep, right.Y * moveStep
-    elseif direction == "A" then dx, dy = -right.X * moveStep, -right.Y * moveStep
-    elseif direction == "Up" then dz = moveStep
-    elseif direction == "Down" then dz = -moveStep
-    end
+        if direction == "W" then dx, dy, dz = forward.X * moveStep, forward.Y * moveStep, forward.Z * moveStep
+        elseif direction == "S" then dx, dy, dz = -forward.X * moveStep, -forward.Y * moveStep, -forward.Z * moveStep
+        elseif direction == "D" then dx, dy = right.X * moveStep, right.Y * moveStep
+        elseif direction == "A" then dx, dy = -right.X * moveStep, -right.Y * moveStep
+        elseif direction == "Up" then dz = moveStep
+        elseif direction == "Down" then dz = -moveStep
+        end
 
-    local loc = pawn:K2_GetActorLocation()
-    pawn:K2_SetActorLocation({ X = loc.X + dx, Y = loc.Y + dy, Z = loc.Z + dz }, false, {}, true)
+        local loc = pawn:K2_GetActorLocation()
+        pawn:K2_SetActorLocation({ X = loc.X + dx, Y = loc.Y + dy, Z = loc.Z + dz }, false, {}, true)
+    end)
 end
 
 
 -- 4/6: Update Kart Rotation (Visual)
 local function UpdateKartRotation(yawOffset)
-    local pawn = UEHelpers.GetPlayerController():K2_GetPawn()
-    if pawn and pawn.SM_KartTracker and pawn.SM_KartTracker:IsValid() then
-        local rot = pawn.SM_KartTracker.RelativeRotation
-        rot.Yaw = rot.Yaw + yawOffset
-        pawn.SM_KartTracker.RelativeRotation = rot
-        flightYaw = rot.Yaw -- Sync internal yaw
-    end
+    ExecuteInGameThread(function()
+        local pawn = UEHelpers.GetPlayerController():K2_GetPawn()
+        if pawn and pawn.SM_KartTracker and pawn.SM_KartTracker:IsValid() then
+            local rot = pawn.SM_KartTracker.RelativeRotation
+            rot.Yaw = rot.Yaw + yawOffset
+            pawn.SM_KartTracker.RelativeRotation = rot
+            flightYaw = rot.Yaw -- Sync internal yaw
+        end
+    end)
 end
 
 -- 8/5: Update Flight Pitch (Movement direction only, no visual change)
 local function UpdateFlightPitch(pitchOffset)
     flightPitch = flightPitch + pitchOffset
     print("Flight Pitch set to: " .. flightPitch)
-end
-
-local function GetCurrentLocalPlayerController()
-    local GameInstance = UEHelpers.GetGameInstance()
-    if GameInstance and GameInstance:IsValid() then
-        local LocalPlayers = GameInstance.LocalPlayers
-        if LocalPlayers and LocalPlayers[1] and LocalPlayers[1]:IsValid() then
-            local livePC = LocalPlayers[1].PlayerController
-            if livePC and livePC:IsValid() then
-                return livePC
-            end
-        end
-    end
-    return nil
 end
 
 local function GetCurrentLocalPlayerController()
@@ -156,20 +146,6 @@ end)
 -- F12: Teleport (console command)
 RegisterKeyBind(Key.F12, function()
     ExecuteInGameThread(function()
-        local function GetCurrentLocalPlayerController()
-            local GameInstance = UEHelpers.GetGameInstance()
-            if GameInstance and GameInstance:IsValid() then
-                local LocalPlayers = GameInstance.LocalPlayers
-                if LocalPlayers and LocalPlayers[1] and LocalPlayers[1]:IsValid() then
-                    local livePC = LocalPlayers[1].PlayerController
-                    if livePC and livePC:IsValid() then
-                        return livePC
-                    end
-                end
-            end
-            return nil
-        end
-
         local KismetSystemLibrary = StaticFindObject("/Script/Engine.Default__KismetSystemLibrary")
         local livePC = GetCurrentLocalPlayerController()
 
@@ -184,32 +160,36 @@ end)
 
 -- F2: Save State
 RegisterKeyBind(Key.F2, function ()
-    local pawn = UEHelpers.GetPlayerController():K2_GetPawn()
-    if pawn and pawn:IsValid() and pawn.SM_KartTracker and pawn.SM_KartTracker:IsValid() then
-        local loc = pawn:K2_GetActorLocation()
-        local rot = pawn.SM_KartTracker.RelativeRotation
-        local vel = pawn:GetVelocity()
-        savedPos = { X = loc.X, Y = loc.Y, Z = loc.Z }
-        savedRot = { Pitch = rot.Pitch, Yaw = rot.Yaw, Roll = rot.Roll }
-        savedVelocity = { X = vel.X, Y = vel.Y, Z = vel.Z }
-        print(string.format("State Saved: Pos(%.0f, %.0f, %.0f)", savedPos.X, savedPos.Y, savedPos.Z))
-    end
+    ExecuteInGameThread(function()
+        local pawn = UEHelpers.GetPlayerController():K2_GetPawn()
+        if pawn and pawn:IsValid() and pawn.SM_KartTracker and pawn.SM_KartTracker:IsValid() then
+            local loc = pawn:K2_GetActorLocation()
+            local rot = pawn.SM_KartTracker.RelativeRotation
+            local vel = pawn:GetVelocity()
+            savedPos = { X = loc.X, Y = loc.Y, Z = loc.Z }
+            savedRot = { Pitch = rot.Pitch, Yaw = rot.Yaw, Roll = rot.Roll }
+            savedVelocity = { X = vel.X, Y = vel.Y, Z = vel.Z }
+            print(string.format("State Saved: Pos(%.0f, %.0f, %.0f)", savedPos.X, savedPos.Y, savedPos.Z))
+        end
+    end)
 end)
 
 -- F3: Restore State
 RegisterKeyBind(Key.F3, function ()
-    if not savedPos or not savedRot or not savedVelocity then return end
-    local pawn = UEHelpers.GetPlayerController():K2_GetPawn()
-    if pawn and pawn:IsValid() then
-        pawn:K2_TeleportTo(savedPos, { Pitch = savedRot.Pitch, Yaw = savedRot.Yaw, Roll = savedRot.Roll })
-        if pawn.SM_KartTracker and pawn.SM_KartTracker:IsValid() then
-            pawn.SM_KartTracker.RelativeRotation = savedRot
+    ExecuteInGameThread(function()
+        if not savedPos or not savedRot or not savedVelocity then return end
+        local pawn = UEHelpers.GetPlayerController():K2_GetPawn()
+        if pawn and pawn:IsValid() then
+            pawn:K2_TeleportTo(savedPos, { Pitch = savedRot.Pitch, Yaw = savedRot.Yaw, Roll = savedRot.Roll })
+            if pawn.SM_KartTracker and pawn.SM_KartTracker:IsValid() then
+                pawn.SM_KartTracker.RelativeRotation = savedRot
+            end
+            if pawn.Sphere and pawn.Sphere:IsValid() then
+                pawn.Sphere:SetPhysicsLinearVelocity(savedVelocity, false, FName("None"))
+            end
+            print("State Restored.")
         end
-        if pawn.Sphere and pawn.Sphere:IsValid() then
-            pawn.Sphere:SetPhysicsLinearVelocity(savedVelocity, false, FName("None"))
-        end
-        print("State Restored.")
-    end
+    end)
 end)
 
 -- F8: Reveal Components
@@ -234,7 +214,7 @@ RegisterKeyBind(Key.F9, function()
     ExecuteInGameThread(function()
         showFloors = not showFloors
         local meshes = FindAllOf("StaticMeshComponent")
-        
+
         for _, mesh in pairs(meshes) do
             local owner = mesh:GetOwner()
             if owner and owner:IsValid() then
@@ -264,13 +244,15 @@ RegisterKeyBind(Key.F5, function() moveStep = moveStep + 20.0; print("Step Incre
 
 -- F1: Toggle NoClip
 RegisterKeyBind(Key.F1, function()
-    local pawn = UEHelpers.GetPlayerController():K2_GetPawn()
-    if pawn and pawn:IsValid() then
-        noclip = not noclip
-        if noclip then SyncFlightRotation() end
-        if pawn.Sphere and pawn.Sphere:IsValid() then
-            pawn.Sphere:SetSimulatePhysics(not noclip)
+    ExecuteInGameThread(function()
+        local pawn = UEHelpers.GetPlayerController():K2_GetPawn()
+        if pawn and pawn:IsValid() then
+            noclip = not noclip
+            if noclip then SyncFlightRotation() end
+            if pawn.Sphere and pawn.Sphere:IsValid() then
+                pawn.Sphere:SetSimulatePhysics(not noclip)
+            end
+            print("NoClip: " .. (noclip and "ON" or "OFF"))
         end
-        print("NoClip: " .. (noclip and "ON" or "OFF"))
-    end
+    end)
 end)
