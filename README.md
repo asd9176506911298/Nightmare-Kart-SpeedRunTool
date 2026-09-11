@@ -6,6 +6,7 @@
 |---|---|
 | `F1` | NoClip |
 | `W A S D` | Move |
+| `Q E` | Down / Up |
 | `Numpad 4 / 6` | Yaw |
 | `Numpad 8 / 5` | Pitch |
 | `F2` | Save Position / Rotation / Velocity |
